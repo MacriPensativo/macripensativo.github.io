@@ -1,6 +1,7 @@
+import { savePedido, obtenerPedidos, actualizarEstadoPedido, eliminarPedido } from './firebase.js';
+
 const form = document.getElementById('pedidoForm');
 const tabla = document.getElementById('pedidosTabla');
-const dbRef = firebase.database().ref('pedidos');
 let pedidos = []; // Inicializar la variable para almacenar los pedidos
 
 const renderPedidos = () => {
@@ -48,13 +49,7 @@ const agregarPedido = (e) => {
     };
 
     // Guardar el nuevo pedido en Firebase
-    dbRef.push(nuevoPedido)
-        .then(() => {
-            alert("Pedido agregado con éxito");
-        })
-        .catch((error) => {
-            console.error("Error al guardar el pedido: ", error);
-        });
+    savePedido(cliente, fecha, detalle, precio, fechaEntrega, lugarEntrega);
 
     renderPedidos();
     form.reset();
@@ -62,8 +57,7 @@ const agregarPedido = (e) => {
 
 // Función para cargar los pedidos desde Firebase
 const cargarPedidos = () => {
-    dbRef.on('value', (snapshot) => {
-        const pedidosData = snapshot.val();
+    obtenerPedidos((pedidosData) => {
         if (pedidosData) {
             pedidos = Object.values(pedidosData);
             renderPedidos();
@@ -94,32 +88,27 @@ const modificarPedido = (index) => {
         };
 
         // Actualizar el pedido modificado en Firebase
-        const pedidoModificado = pedidos[index];
-        const pedidoRef = dbRef.child(Object.keys(pedidosData)[index]);
-        pedidoRef.update(pedidoModificado);
-        
+        const pedidoId = Object.keys(pedidosData)[index];
+        actualizarEstadoPedido(pedidoId, pedidos[index]);
+
         renderPedidos();
     }
 };
 
 const eliminarPedido = (index) => {
     if (confirm('¿Estás seguro de que deseas eliminar este pedido?')) {
-        const pedidoRef = dbRef.child(Object.keys(pedidosData)[index]);
-        pedidoRef.remove()
-            .then(() => {
-                pedidos.splice(index, 1);
-                renderPedidos();
-            })
-            .catch((error) => {
-                console.error('Error al eliminar el pedido:', error);
-            });
+        const pedidoId = Object.keys(pedidosData)[index];
+        eliminarPedido(pedidoId);
+
+        pedidos.splice(index, 1);
+        renderPedidos();
     }
 };
 
 const completarPedido = (index) => {
     pedidos[index].estado = pedidos[index].estado === 'Completado' ? 'Pendiente' : 'Completado';
-    const pedidoRef = dbRef.child(Object.keys(pedidosData)[index]);
-    pedidoRef.update({ estado: pedidos[index].estado });
+    const pedidoId = Object.keys(pedidosData)[index];
+    actualizarEstadoPedido(pedidoId, pedidos[index].estado);
     renderPedidos();
 };
 
