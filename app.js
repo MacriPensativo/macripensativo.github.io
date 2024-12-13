@@ -3,6 +3,7 @@ import { savePedido, obtenerPedidos, actualizarEstadoPedido, eliminarPedido } fr
 const form = document.getElementById('pedidoForm');
 const tabla = document.getElementById('pedidosTabla');
 let pedidos = []; // Inicializar la variable para almacenar los pedidos
+let pedidosData = {}; // Para almacenar los pedidos con sus IDs de Firebase
 
 const renderPedidos = () => {
     tabla.innerHTML = '';
@@ -18,9 +19,9 @@ const renderPedidos = () => {
             <td>${pedido.lugarEntrega}</td>
             <td>${pedido.estado}</td>
             <td>
-                <button class="btn-modify" onclick="modificarPedido(${index})">Modificar</button>
-                <button class="btn-delete" onclick="eliminarPedido(${index})">Eliminar</button>
-                <button class="btn-complete" onclick="completarPedido(${index})">
+                <button class="btn-modify" onclick="modificarPedido('${Object.keys(pedidosData)[index]}')">Modificar</button>
+                <button class="btn-delete" onclick="eliminarPedido('${Object.keys(pedidosData)[index]}')">Eliminar</button>
+                <button class="btn-complete" onclick="completarPedido('${Object.keys(pedidosData)[index]}')">
                     ${pedido.estado === 'Completado' ? 'Revertir' : 'Completar'}
                 </button>
             </td>
@@ -48,27 +49,34 @@ const agregarPedido = (e) => {
         estado: 'Pendiente'
     };
 
-    // Guardar el nuevo pedido en Firebase
-    savePedido(cliente, fecha, detalle, precio, fechaEntrega, lugarEntrega);
+    // Guardar el nuevo pedido en Firebase y obtener su ID
+    savePedido(cliente, fecha, detalle, precio, fechaEntrega, lugarEntrega)
+        .then((pedidoId) => {
+            // Cuando se guarda el pedido, actualizamos el estado local
+            pedidosData[pedidoId] = nuevoPedido;
+            pedidos.push(nuevoPedido);
+            renderPedidos();
+        });
 
-    renderPedidos();
     form.reset();
 };
 
 // Función para cargar los pedidos desde Firebase
 const cargarPedidos = () => {
-    obtenerPedidos((pedidosData) => {
-        if (pedidosData) {
-            pedidos = Object.values(pedidosData);
+    obtenerPedidos((pedidosDataFirebase) => {
+        if (pedidosDataFirebase) {
+            pedidosData = pedidosDataFirebase;
+            pedidos = Object.values(pedidosDataFirebase);
             renderPedidos();
         } else {
             pedidos = [];
+            pedidosData = {};
         }
     });
 };
 
-const modificarPedido = (index) => {
-    const pedido = pedidos[index];
+const modificarPedido = (pedidoId) => {
+    const pedido = pedidosData[pedidoId];
     const nuevoCliente = prompt('Modificar cliente:', pedido.cliente);
     const nuevaFecha = prompt('Modificar fecha:', pedido.fecha);
     const nuevoDetalle = prompt('Modificar detalle:', pedido.detalle);
@@ -77,7 +85,7 @@ const modificarPedido = (index) => {
     const nuevoLugarEntrega = prompt('Modificar lugar de entrega:', pedido.lugarEntrega);
 
     if (nuevoCliente && nuevaFecha && nuevoDetalle && nuevoPrecio && nuevaFechaEntrega && nuevoLugarEntrega) {
-        pedidos[index] = {
+        pedidosData[pedidoId] = {
             ...pedido,
             cliente: nuevoCliente,
             fecha: nuevaFecha,
@@ -88,27 +96,35 @@ const modificarPedido = (index) => {
         };
 
         // Actualizar el pedido modificado en Firebase
-        const pedidoId = Object.keys(pedidosData)[index];
-        actualizarEstadoPedido(pedidoId, pedidos[index]);
+        actualizarEstadoPedido(pedidoId, pedidosData[pedidoId]);
 
+        // Actualizar el array de pedidos para renderizar
+        pedidos = Object.values(pedidosData);
         renderPedidos();
     }
 };
 
-const eliminarPedido = (index) => {
+const eliminarPedido = (pedidoId) => {
     if (confirm('¿Estás seguro de que deseas eliminar este pedido?')) {
-        const pedidoId = Object.keys(pedidosData)[index];
+        // Eliminar el pedido de Firebase
         eliminarPedido(pedidoId);
 
-        pedidos.splice(index, 1);
+        // Eliminar el pedido localmente
+        delete pedidosData[pedidoId];
+        pedidos = Object.values(pedidosData);
         renderPedidos();
     }
 };
 
-const completarPedido = (index) => {
-    pedidos[index].estado = pedidos[index].estado === 'Completado' ? 'Pendiente' : 'Completado';
-    const pedidoId = Object.keys(pedidosData)[index];
-    actualizarEstadoPedido(pedidoId, pedidos[index].estado);
+const completarPedido = (pedidoId) => {
+    const pedido = pedidosData[pedidoId];
+    pedido.estado = pedido.estado === 'Completado' ? 'Pendiente' : 'Completado';
+
+    // Actualizar el estado del pedido en Firebase
+    actualizarEstadoPedido(pedidoId, pedido.estado);
+
+    // Actualizar el array de pedidos para renderizar
+    pedidos = Object.values(pedidosData);
     renderPedidos();
 };
 
