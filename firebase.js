@@ -31,7 +31,7 @@ export const obtenerPedidos = (callback) => {
 // Función para guardar un nuevo pedido en Firebase
 export const savePedido = (cliente, fecha, detalle, precio, fechaEntrega, lugarEntrega) => {
     const nuevoPedidoRef = push(pedidosRef);  // Crear una nueva referencia para el pedido
-    set(nuevoPedidoRef, {
+    return set(nuevoPedidoRef, {
         cliente,
         fecha,
         detalle,
@@ -41,10 +41,12 @@ export const savePedido = (cliente, fecha, detalle, precio, fechaEntrega, lugarE
         estado: 'Pendiente'  // Estado inicial
     }).then(() => {
         console.log("Pedido guardado exitosamente en Firebase");
+        return nuevoPedidoRef.key;  // Retornar el ID del nuevo pedido
     }).catch((error) => {
         console.error("Error al guardar el pedido:", error);
     });
 };
+
 
 // Función para actualizar el estado del pedido (completar o revertir)
 export const actualizarEstadoPedido = (pedidoId, estado) => {
