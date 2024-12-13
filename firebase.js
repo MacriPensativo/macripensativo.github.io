@@ -18,7 +18,7 @@ const app = initializeApp(firebaseConfig);
 
 // Inicializar la base de datos
 const database = getDatabase(app);
-const pedidoFormDB = ref(database, 'condu');
+const pedidosRef = ref(database, 'pedidos');  // Cambié 'condu' a 'pedidos'
 
 // Obtener el formulario y agregar el listener
 document.getElementById('pedidoForm').addEventListener('submit', submitForm);
@@ -28,13 +28,15 @@ function submitForm(e) {
     e.preventDefault();
 
     // Obtener los valores de los campos del formulario
-    const name = getElementVal('cliente');
+    const cliente = getElementVal('cliente');
     const fecha = getElementVal('fecha');
+    const detalle = getElementVal('detalle');  // Agregar detalle
     const precio = getElementVal('precio');
     const fechaEntrega = getElementVal('fechaEntrega');
+    const lugarEntrega = document.querySelector('input[name="lugarEntrega"]:checked').value;
 
     // Guardar los datos en Firebase
-    saveMessages(name, fecha, precio, fechaEntrega);
+    savePedido(cliente, fecha, detalle, precio, fechaEntrega, lugarEntrega);
 
     // Opcional: limpiar el formulario
     document.getElementById('pedidoForm').reset();
@@ -44,13 +46,16 @@ function submitForm(e) {
 }
 
 // Función para guardar los datos en Firebase
-const saveMessages = (name, fecha, precio, fechaEntrega) => {
-    const newPedido = push(pedidoFormDB); // Crear una nueva referencia para el pedido
-    set(newPedido, {
-        name: name,
+const savePedido = (cliente, fecha, detalle, precio, fechaEntrega, lugarEntrega) => {
+    const nuevoPedidoRef = push(pedidosRef); // Crear una nueva referencia para el pedido
+    set(nuevoPedidoRef, {
+        cliente: cliente,
         fecha: fecha,
+        detalle: detalle,  // Incluir el detalle
         precio: precio,
-        fechaEntrega: fechaEntrega
+        fechaEntrega: fechaEntrega,
+        lugarEntrega: lugarEntrega,
+        estado: 'Pendiente'  // Estado inicial
     }).then(() => {
         console.log("Pedido guardado exitosamente en Firebase");
     }).catch((error) => {
@@ -62,3 +67,38 @@ const saveMessages = (name, fecha, precio, fechaEntrega) => {
 const getElementVal = (id) => {
     return document.getElementById(id).value;
 };
+
+
+// Obtener los pedidos desde Firebase y mostrarlos en la tabla
+const pedidosTabla = document.getElementById('pedidosTabla');
+
+function obtenerPedidos() {
+    const pedidosRef = ref(database, 'pedidos');
+    onValue(pedidosRef, (snapshot) => {
+        const pedidos = snapshot.val();
+        pedidosTabla.innerHTML = '';  // Limpiar la tabla antes de volver a llenarla
+
+        for (let id in pedidos) {
+            const pedido = pedidos[id];
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${pedido.cliente}</td>
+                <td>${pedido.fecha}</td>
+                <td>${pedido.detalle}</td>
+                <td>${pedido.precio}</td>
+                <td>${pedido.fechaEntrega}</td>
+                <td>${pedido.lugarEntrega}</td>
+                <td>${pedido.estado}</td>
+                <td>
+                    <button class="btn-modify">Modificar</button>
+                    <button class="btn-delete">Eliminar</button>
+                    <button class="btn-complete">Completar</button>
+                </td>
+            `;
+            pedidosTabla.appendChild(row);
+        }
+    });
+}
+
+// Llamar a la función para obtener y mostrar los pedidos cuando se cargue la página
+window.onload = obtenerPedidos;
