@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #444;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        form input, form textarea, form select, form button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        form input[type="radio"] {
+            width: auto;
+            margin-right: 5px;
+        }
+
+        form button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        td button {
+            padding: 6px 14px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        td button:hover {
+            opacity: 0.8;
+        }
+
+        .btn-modify {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .btn-modify:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .btn-complete {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background-color: #218838;
+        }
+
+        .completed {
+            background-color: #d4edda !important;
+        }
+
+        .completed td {
+            color: #155724;
+        }
+
+        .btn-complete, .btn-modify, .btn-delete {
+            width: 100px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gestión de Pedidos</h1>
+
+    <form id="pedidoForm">
+        <label for="cliente">Nombre del Cliente:</label>
+        <input type="text" id="cliente" required>
+
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" required>
+
+        <label for="detalle">Detalle del Pedido:</label>
+        <textarea id="detalle" required></textarea>
+
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" required>
+
+        <label for="fechaEntrega">Fecha de Entrega:</label>
+        <input type="date" id="fechaEntrega" required>
+
+        <label for="lugarEntrega">Lugar de Entrega:</label>
+        <label>
+            <input type="radio" name="lugarEntrega" value="Villa Adelina" required> Villa Adelina
+        </label>
+        <label>
+            <input type="radio" name="lugarEntrega" value="Martínez" required> Martínez
+        </label>
+
+        <button type="submit">Agregar Pedido</button>
+    </form>
+
+    <h2>Pedidos</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Detalle</th>
+                <th>Precio</th>
+                <th>Fecha de Entrega</th>
+                <th>Lugar de Entrega</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="pedidosTabla"></tbody>
+    </table>
+
+    <script type="module" src="firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
