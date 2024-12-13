@@ -1,6 +1,6 @@
-// Importar las funciones necesarias de Firebase
+// Importar las funciones necesarias de Firebase (versión modular)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -15,9 +15,9 @@ const firebaseConfig = {
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-
-// Inicializar la base de datos
 const database = getDatabase(app);
+
+// Inicializar la referencia a la base de datos 'pedidos'
 const pedidosRef = ref(database, 'pedidos');
 
 // Función para obtener los pedidos desde Firebase y ejecutar una callback
@@ -49,7 +49,7 @@ export const savePedido = (cliente, fecha, detalle, precio, fechaEntrega, lugarE
 // Función para actualizar el estado del pedido (completar o revertir)
 export const actualizarEstadoPedido = (pedidoId, estado) => {
     const pedidoRef = ref(database, `pedidos/${pedidoId}`);
-    set(pedidoRef, {
+    update(pedidoRef, {
         estado: estado
     }).then(() => {
         console.log("Estado actualizado exitosamente");
@@ -61,7 +61,7 @@ export const actualizarEstadoPedido = (pedidoId, estado) => {
 // Función para eliminar un pedido de Firebase
 export const eliminarPedido = (pedidoId) => {
     const pedidoRef = ref(database, `pedidos/${pedidoId}`);
-    pedidoRef.remove().then(() => {
+    remove(pedidoRef).then(() => {
         console.log("Pedido eliminado exitosamente");
     }).catch((error) => {
         console.error("Error al eliminar el pedido:", error);
