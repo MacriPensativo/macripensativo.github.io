@@ -1,8 +1,8 @@
 // firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-// Tu configuración de Firebase
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBt2AnygOlB1WCA2FUE0zE1OJFOvsaDKsw",
   authDomain: "aromasluecs.firebaseapp.com",
@@ -33,14 +33,7 @@ export const obtenerPedidos = (callback) => {
   });
 };
 
-// Función para actualizar un pedido
 export const actualizarPedido = (id, pedido) => {
-  const pedidoRef = ref(database, `pedidos/${id}`);
+  const pedidoRef = ref(database, `pedidos/${id}`); // Se agregan las comillas invertidas para interpolar la variable 'id'
   return set(pedidoRef, pedido);
-};
-
-// Función para eliminar un pedido
-export const eliminarPedido = (id) => {
-  const pedidoRef = ref(database, `pedidos/${id}`);
-  return remove(pedidoRef);
 };
