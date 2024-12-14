@@ -21,8 +21,8 @@ const renderPedidos = (pedidos) => {
           <td>
             <button class="btn-modify" onclick="modificarPedido('${id}')">Modificar</button>
             <button class="btn-delete" onclick="eliminarPedido('${id}')">Eliminar</button>
-            <button class="btn-complete" onclick="EntergarPedido('${id}')">
-              ${pedido.estado === 'Entregado' ? 'Revertir' : 'Entergar'}
+            <button class="btn-complete" onclick="EntregarPedido('${id}')">
+              ${pedido.estado === 'Entregado' ? 'Revertir' : 'Entregar'}
             </button>
           </td>
         `;
@@ -82,8 +82,8 @@ window.eliminarPedido = (id) => {
   }
 };
 
-// Entergar/Revertir un pedido
-window.EntergarPedido = (id) => {
+// Entregar/Revertir un pedido
+window.EntregarPedido = (id) => {
   obtenerPedidos((data) => {
     const pedido = data[id];
     if (pedido) {
