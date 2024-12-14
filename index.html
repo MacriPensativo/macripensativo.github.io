@@ -8,7 +8,7 @@
         /* General */
         body {
             font-family: 'Arial', sans-serif;
-            padding: 20px;
+            padding: 10px;
             background-color: #f9f9f9;
             color: #333;
             line-height: 1.6;
@@ -22,7 +22,7 @@
         /* Formulario */
         form {
             background: #fff;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
@@ -34,9 +34,9 @@
             font-weight: bold;
         }
 
-        form input, form textarea, form select, form button {
+        form input, form textarea, form button {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 6px;
@@ -64,6 +64,11 @@
         }
 
         /* Tabla */
+        .table-container {
+            overflow-x: auto; /* Scroll horizontal en pantallas pequeñas */
+            margin-top: 10px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -74,7 +79,7 @@
 
         th, td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 10px;
             text-align: left;
         }
 
@@ -83,12 +88,12 @@
         }
 
         td button {
-            padding: 6px 14px;
-            font-size: 14px;
+            padding: 6px 10px;
+            font-size: 12px;
             border-radius: 6px;
             border: none;
             cursor: pointer;
-            margin-right: 5px;
+            margin-bottom: 5px;
             transition: background-color 0.3s ease;
         }
 
@@ -101,26 +106,14 @@
             color: white;
         }
 
-        .btn-modify:hover {
-            background-color: #e0a800;
-        }
-
         .btn-delete {
             background-color: #dc3545;
             color: white;
         }
 
-        .btn-delete:hover {
-            background-color: #c82333;
-        }
-
         .btn-complete {
             background-color: #28a745;
             color: white;
-        }
-
-        .btn-complete:hover {
-            background-color: #218838;
         }
 
         .completed {
@@ -133,14 +126,62 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            form input, form textarea, form button, table {
-                width: 100%;
+            form {
+                padding: 10px;
+            }
+
+            form input, form textarea, form button {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            table, th, td {
+                font-size: 12px;
             }
 
             td button {
-                margin-bottom: 5px;
-                display: block;
+                display: block; /* Botones en columna */
                 width: 100%;
+                margin-right: 0;
+            }
+
+            .table-container {
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Diseño apilado para la tabla */
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            tr {
+                margin-bottom: 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            th {
+                display: none; /* Ocultar encabezados */
+            }
+
+            td {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            td:last-child {
+                border-bottom: none;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #444;
             }
         }
     </style>
@@ -148,6 +189,7 @@
 <body>
     <h1>Gestión de Pedidos</h1>
 
+    <!-- Formulario -->
     <form id="pedidoForm">
         <label for="cliente">Nombre del Cliente:</label>
         <input type="text" id="cliente" placeholder="Ingresa el nombre del cliente" required>
@@ -175,22 +217,25 @@
         <button type="submit">Agregar Pedido</button>
     </form>
 
+    <!-- Tabla -->
     <h2>Pedidos</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Detalle</th>
-                <th>Precio</th>
-                <th>Fecha de Entrega</th>
-                <th>Lugar de Entrega</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="pedidosTabla"></tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Detalle</th>
+                    <th>Precio</th>
+                    <th>Fecha de Entrega</th>
+                    <th>Lugar de Entrega</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="pedidosTabla"></tbody>
+        </table>
+    </div>
 
     <!-- Importación de Scripts -->
     <script type="module" src="app.js"></script>
