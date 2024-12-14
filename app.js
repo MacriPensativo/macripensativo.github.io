@@ -3,34 +3,35 @@ import { guardarPedido, obtenerPedidos, actualizarPedido } from "./firebase.js";
 const form = document.getElementById('pedidoForm');
 const tabla = document.getElementById('pedidosTabla');
 
+// Función global para almacenar pedidos en memoria
+let pedidosEnMemoria = {};
+
 // Renderizar pedidos en la tabla
 const renderPedidos = (pedidos) => {
-    tabla.innerHTML = ''; // Limpiar tabla
-    if (pedidos) {
-      Object.entries(pedidos).forEach(([id, pedido]) => {
-        const row = document.createElement('tr');
-        if (pedido.estado === 'Entregado') row.classList.add('completed');
-        row.innerHTML = `
-          <td>${pedido.cliente}</td>
-          <td>${pedido.fecha}</td>
-          <td>${pedido.detalle}</td>
-          <td>$${pedido.precio}</td>
-          <td>${pedido.fechaEntrega}</td>
-          <td>${pedido.lugarEntrega}</td>
-          <td>${pedido.estado}</td>
-          <td>
-            <button class="btn-modify" onclick="modificarPedido('${id}')">Modificar</button>
-            <button class="btn-delete" onclick="eliminarPedido('${id}')">Eliminar</button>
-            <button class="btn-complete" onclick="EntregarPedido('${id}')">
-              ${pedido.estado === 'Entregado' ? 'Revertir' : 'Entregar'}
-            </button>
-          </td>
-        `;
-        tabla.appendChild(row);
-      });
-    }
-  };
-  
+  pedidosEnMemoria = pedidos || {}; // Actualizamos la memoria local
+  tabla.innerHTML = ''; // Limpiar tabla
+  Object.entries(pedidosEnMemoria).forEach(([id, pedido]) => {
+    const row = document.createElement('tr');
+    if (pedido.estado === 'Entregado') row.classList.add('completed');
+    row.innerHTML = `
+      <td>${pedido.cliente}</td>
+      <td>${pedido.fecha}</td>
+      <td>${pedido.detalle}</td>
+      <td>$${pedido.precio}</td>
+      <td>${pedido.fechaEntrega}</td>
+      <td>${pedido.lugarEntrega}</td>
+      <td>${pedido.estado}</td>
+      <td>
+        <button class="btn-modify" onclick="modificarPedido('${id}')">Modificar</button>
+        <button class="btn-delete" onclick="eliminarPedido('${id}')">Eliminar</button>
+        <button class="btn-complete" onclick="EntregarPedido('${id}')">
+          ${pedido.estado === 'Entregado' ? 'Revertir' : 'Entregar'}
+        </button>
+      </td>
+    `;
+    tabla.appendChild(row);
+  });
+};
 
 // Escuchar el formulario y agregar un nuevo pedido
 form.addEventListener('submit', (e) => {
@@ -61,17 +62,18 @@ obtenerPedidos((data) => {
 
 // Modificar un pedido
 window.modificarPedido = (id) => {
-  const cliente = prompt('Modificar cliente:');
-  const fecha = prompt('Modificar fecha:');
-  const detalle = prompt('Modificar detalle:');
-  const precio = prompt('Modificar precio:');
-  const fechaEntrega = prompt('Modificar fecha de entrega:');
-  const lugarEntrega = prompt('Modificar lugar de entrega:');
+  const pedidoActual = pedidosEnMemoria[id];
+  if (!pedidoActual) return;
+
+  const cliente = prompt('Modificar cliente:', pedidoActual.cliente);
+  const fecha = prompt('Modificar fecha:', pedidoActual.fecha);
+  const detalle = prompt('Modificar detalle:', pedidoActual.detalle);
+  const precio = prompt('Modificar precio:', pedidoActual.precio);
+  const fechaEntrega = prompt('Modificar fecha de entrega:', pedidoActual.fechaEntrega);
+  const lugarEntrega = prompt('Modificar lugar de entrega:', pedidoActual.lugarEntrega);
 
   if (cliente && fecha && detalle && precio && fechaEntrega && lugarEntrega) {
-    actualizarPedido(id, {
-      cliente, fecha, detalle, precio, fechaEntrega, lugarEntrega, estado: 'No Entregado'
-    });
+    actualizarPedido(id, { ...pedidoActual, cliente, fecha, detalle, precio, fechaEntrega, lugarEntrega });
   }
 };
 
@@ -83,11 +85,19 @@ window.eliminarPedido = (id) => {
 };
 
 // Entregar/Revertir un pedido
+// Entregar/Revertir un pedido
 window.EntregarPedido = (id) => {
-  obtenerPedidos((data) => {
-    const pedido = data[id];
-    if (pedido) {
-      actualizarPedido(id, { ...pedido, estado: pedido.estado === 'Entregado' ? 'No Entregado' : 'Entregado' });
-    }
-  });
+  const pedido = pedidosEnMemoria[id]; // Obtenemos el pedido de memoria
+  if (pedido) {
+    const nuevoEstado = pedido.estado === 'Entregado' ? 'No Entregado' : 'Entregado';
+    actualizarPedido(id, { ...pedido, estado: nuevoEstado })
+      .then(() => {
+        console.log("Pedido entregado/revertido correctamente.");
+        // Forzar recarga de datos
+        obtenerPedidos((data) => {
+          renderPedidos(data);
+        });
+      })
+      .catch((error) => console.error("Error al actualizar el estado del pedido:", error));
+  }
 };
