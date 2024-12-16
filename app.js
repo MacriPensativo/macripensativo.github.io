@@ -12,7 +12,16 @@ const renderPedidos = (pedidos) => {
   tabla.innerHTML = ''; // Limpiar tabla
   Object.entries(pedidosEnMemoria).forEach(([id, pedido]) => {
     const row = document.createElement('tr');
-    if (pedido.estado === 'Entregado') row.classList.add('completed');
+
+    // Asignar clases según el estado
+    if (pedido.estado === 'Entregado') {
+      row.classList.add('completed'); // Clase para "Entregado"
+    } else if (pedido.estado === 'En Armado') {
+      row.classList.add('armado'); // Clase para "En Armado"
+    } else if (pedido.estado === 'Listo') {
+      row.classList.add('listo'); // Clase para "Listo"
+    }
+
     row.innerHTML = `
       <td>${pedido.cliente}</td>
       <td>${pedido.fecha}</td>
@@ -27,11 +36,32 @@ const renderPedidos = (pedidos) => {
         <button class="btn-complete" onclick="EntregarPedido('${id}')">
           ${pedido.estado === 'Entregado' ? 'Revertir' : 'Entregar'}
         </button>
+        <button class="btn-armado" onclick="cambiarEstado('${id}', 'En Armado')">En Armado</button>
+        <button class="btn-listo" onclick="cambiarEstado('${id}', 'Listo')">Listo</button>
       </td>
     `;
     tabla.appendChild(row);
   });
 };
+
+
+
+window.cambiarEstado = (id, nuevoEstado) => {
+  const pedido = pedidosEnMemoria[id];
+  if (pedido) {
+    actualizarPedido(id, { ...pedido, estado: nuevoEstado })
+      .then(() => {
+        console.log(`Pedido marcado como "${nuevoEstado}".`);
+        // Forzar recarga de datos y actualización de la tabla
+        obtenerPedidos((data) => {
+          renderPedidos(data);
+        });
+      })
+      .catch((error) => console.error("Error al actualizar el estado del pedido:", error));
+  }
+};
+ 
+
 
 // Escuchar el formulario y agregar un nuevo pedido
 form.addEventListener('submit', (e) => {
