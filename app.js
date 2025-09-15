@@ -131,3 +131,42 @@ window.EntregarPedido = (id) => {
       .catch((error) => console.error("Error al actualizar el estado del pedido:", error));
   }
 };
+
+
+// ACA STOCK
+
+
+import { actualizarStock, obtenerStock } from './firebase.js';
+
+let stock = productos.map(p => ({producto: p, disponible: true}));
+
+// Renderizar tabla de stock
+const renderStock = () => {
+    const stockTabla = document.getElementById('stockTabla');
+    stockTabla.innerHTML = '';
+    stock.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td data-label='Producto'>${item.producto}</td>
+            <td data-label='Disponible'>
+                <input type='checkbox' ${item.disponible ? 'checked' : ''} 
+                       onchange='toggleStock("${item.producto}", this.checked)'>
+            </td>
+        `;
+        stockTabla.appendChild(row);
+    });
+    // Actualizar lista de disponibles
+    const listaDisponibles = document.getElementById('listaDisponibles');
+    listaDisponibles.textContent = stock.filter(i => i.disponible).map(i => i.producto).join(', ');
+};
+
+// Función global para cambiar stock
+window.toggleStock = (producto, checked) => {
+    actualizarStock(producto, checked); // Esto actualiza Firebase
+};
+
+// Escuchar stock en tiempo real
+obtenerStock((data) => {
+    stock = productos.map(p => ({producto: p, disponible: data[p] !== undefined ? data[p] : true}));
+    renderStock();
+});

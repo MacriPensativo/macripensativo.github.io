@@ -48,3 +48,18 @@ export const actualizarPedido = (id, pedido) => {
     isUpdating = false; // Asegurar que la bandera se desactiva en caso de error
   });
 };
+
+// Referencia a la base de datos para stock ##########
+const stockRef = ref(database, 'stock');
+
+export const actualizarStock = (producto, disponible) => {
+    const productoRef = ref(database, `stock/${producto}`);
+    return set(productoRef, disponible);
+};
+
+export const obtenerStock = (callback) => {
+    onValue(stockRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        callback(data);
+    });
+};
