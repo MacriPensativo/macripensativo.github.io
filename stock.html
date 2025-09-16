@@ -113,21 +113,6 @@
     <tbody id="stockTabla"></tbody>
 </table>
 
-<script>
-    const productos = [
-        'Blend Fusion','Tilo y Lavanda','Tilo','Manzana','Manzana Maracuyá','Higos y lirios','Albahaca Verbena',
-        'Maderas Nobles','Amarettis y café','Vainilla Coco','Flores blancas','Fresh Cardamomo','Jazmin',
-        'Vainilla canela chocolate','Maderas y flores','Limón y flores','Peonias y olivas','Bambú','Coco lima'
-    ];
-
-    let stock = JSON.parse(localStorage.getItem('stock')) || productos.map(p => ({producto: p, disponible: true}));
-
-    const stockTabla = document.getElementById('stockTabla');
-
-    renderStock();
-
-    
-</script>
 <script type="module" src="stock-app.js"></script>
 
 </body>

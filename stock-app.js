@@ -15,6 +15,10 @@ document.body.appendChild(disponiblesDiv);
 
 function renderStock() {
   stockTabla.innerHTML = "";
+
+  // 👇 ordenar: primero disponibles (true), luego no disponibles (false)
+  stock.sort((a, b) => b.disponible - a.disponible);
+
   stock.forEach((item, index) => {
     const row = document.createElement("tr");
 
@@ -26,6 +30,7 @@ function renderStock() {
     check.addEventListener("change", () => {
       stock[index].disponible = check.checked;
       actualizarStock(item.producto, check.checked); // guarda en Firebase
+      renderStock(); // 🔄 re-renderizar para que se reordene
     });
 
     tdCheck.appendChild(check);
