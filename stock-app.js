@@ -4,7 +4,7 @@ import { actualizarStock, obtenerStock } from "./firebase.js";
 const productos = [
   "Blend Fusion","Tilo y Lavanda","Tilo","Manzana","Manzana Maracuyá","Higos y lirios","Albahaca Verbena",
   "Maderas Nobles","Amarettis y café","Vainilla Coco","Flores blancas","Fresh Cardamomo","Jazmin",
-  "Vainilla canela chocolate","Maderas y flores","Limón y flores","Peonias y olivas","Bambú","Coco lima"
+  "Vainilla canela chocolate","Maderas y flores","Limón y flores","Peonias y olivas","Bambú","Coco lima","Frambuesa Pimienta"
 ];
 
 let stock = [];
