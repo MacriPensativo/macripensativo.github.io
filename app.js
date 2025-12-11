@@ -34,7 +34,7 @@ const renderPedidos = (pedidos) => {
         <button class="btn-modify" onclick="modificarPedido('${id}')">Modificar</button>
         <button class="btn-delete" onclick="eliminarPedido('${id}')">Eliminar</button>
         <button class="btn-complete" onclick="EntregarPedido('${id}')">
-          ${pedido.estado === 'Entregado' ? 'Revertir' : 'Entregar'}
+          ${pedido.estado === 'Entregado' ? 'Revertir' : 'Entregado'}
         </button>
         <button class="btn-armado" onclick="cambiarEstado('${id}', 'En Armado')">En Armado</button>
         <button class="btn-listo" onclick="cambiarEstado('${id}', 'Listo')">Listo</button>
